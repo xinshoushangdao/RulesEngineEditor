@@ -1,19 +1,20 @@
-﻿@*
+@*
     // Copyright (c) Alex Reich.
     // Licensed under the CC BY 4.0 License.
 *@
 @using RulesEngineEditor.Models
 @inject RulesEngineEditor.Services.WorkflowService WorkflowService
+@using RulesEngineEditor.Resources
 
 <EditForm EditContext="@EditContext">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <sp_grid_workflow>
         <div>
-            <InputText placeholder="Workflow Name" title="Workflow Name" class="form-control" @bind-Value="@Name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+            <InputText placeholder="@RulesEngineEditor.Resources.SharedResources.WorkflowName" title="@RulesEngineEditor.Resources.SharedResources.WorkflowName" class="form-control" @bind-Value="@Name" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
         </div>
         <div>
-            <button title="Delete Workflow" @onclick="@(e => DeleteWorkflow())" class="btn btn-secondary">
+            <button title="@RulesEngineEditor.Resources.SharedResources.DeleteWorkflow" @onclick="@(e => DeleteWorkflow())" class="btn btn-secondary">
                 <span class="oi oi-trash"></span>
             </button>
         </div>

@@ -1,4 +1,4 @@
-﻿@*
+@*
     // Copyright (c) Alex Reich.
     // Licensed under the CC BY 4.0 License.
 *@
@@ -8,17 +8,18 @@
 @using System.Text.Json.Serialization
 @using System.Text.Json.Serialization.Metadata
 @inject RulesEngineEditor.Services.WorkflowService WorkflowService
+@using RulesEngineEditor.Resources
 
 
 <sp_grid_rules>
-    <div>Rule Name</div>
-    <div>Operator</div>
-    <div>Success Event</div>
-    <div>Error Message</div>
-    <div>Expression</div>
-    <div>Actions</div>
-    <div>Enabled</div>
-    <div>Delete</div>
+    <div>@RulesEngineEditor.Resources.SharedResources.RuleName</div>
+    <div>@RulesEngineEditor.Resources.SharedResources.Operator</div>
+    <div>@RulesEngineEditor.Resources.SharedResources.SuccessEvent</div>
+    <div>@RulesEngineEditor.Resources.SharedResources.ErrorMessage</div>
+    <div>@RulesEngineEditor.Resources.SharedResources.Expression</div>
+    <div>@RulesEngineEditor.Resources.SharedResources.Actions</div>
+    <div>@RulesEngineEditor.Resources.SharedResources.Enabled</div>
+    @* <div>@RulesEngineEditor.Resources.SharedResources.Delete</div> *@
 </sp_grid_rules>
 <EditForm EditContext="@EditContext">
     <DataAnnotationsValidator />
@@ -28,16 +29,16 @@
             <InputText class="form-control" @bind-Value="@rule.RuleName" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
             @if (@rule.ExceptionMessage != "")
             {
-                <blockquote class="reeditor_blockquote @RuleStyle(rule)">@rule.ExceptionMessage</blockquote>
+                <blockquote class="reeditor_blockquote @RuleStyle(rule)">@LocalizeMessage(rule.ExceptionMessage)</blockquote>
             }
         </div>
         <div>
             <InputSelect ValueExpression="@(()=>rule.Operator)" Value="@rule.Operator" class="form-control" ValueChanged="((string value) => OnValueChanged(value))">
                 <option value="null"></option>
-                <option value="And">And</option>
-                <option value="AndAlso">AndAlso</option>
-                <option value="Or">Or</option>
-                <option value="OrElse">OrElse</option>
+                <option value="And">@RulesEngineEditor.Resources.SharedResources.Operator_And</option>
+                <option value="AndAlso">@RulesEngineEditor.Resources.SharedResources.Operator_AndAlso</option>
+                <option value="Or">@RulesEngineEditor.Resources.SharedResources.Operator_Or</option>
+                <option value="OrElse">@RulesEngineEditor.Resources.SharedResources.Operator_OrElse</option>
             </InputSelect>
         </div>
         <div>
@@ -56,19 +57,20 @@
             <InputCheckbox @bind-Value="@rule.Enabled" class="form-control" />
         </div>
         <div>
-            <button @onclick="@(e => RuleDelete.InvokeAsync(rule))" class="btn btn-secondary">
+            <button @onclick="@(e => RuleDelete.InvokeAsync(rule))" class="btn btn-secondary" title="@RulesEngineEditor.Resources.SharedResources.Delete" aria-label="@RulesEngineEditor.Resources.SharedResources.Delete">
                 <span class="oi oi-trash"></span>
+                <span>@RulesEngineEditor.Resources.SharedResources.Delete</span>
             </button>
         </div>
     </sp_grid_rules>
-    <h5>Local Params</h5>
+    <h5>@RulesEngineEditor.Resources.SharedResources.LocalParams</h5>
     <div>
-        <button class="reeditor_button" title="New Local Param" @onclick="NewLocalParam">Add</button>
+        <button class="reeditor_button" title="@RulesEngineEditor.Resources.SharedResources.NewLocalParam" @onclick="NewLocalParam">@RulesEngineEditor.Resources.SharedResources.Add</button>
         <ScopedParams scopedParams=rule.LocalParams ScopedParamsChanged="WorkflowService.WorkflowUpdate" />
     </div>
-    <h5>Rules</h5>
+    <h5>@RulesEngineEditor.Resources.SharedResources.Rules</h5>
     <div>
-        <button class="reeditor_button" title="New Rule" @onclick="(() => WorkflowService.NewRule(rule))">Add</button>
+        <button class="reeditor_button" title="@RulesEngineEditor.Resources.SharedResources.NewRule" @onclick="(() => WorkflowService.NewRule(rule))">@RulesEngineEditor.Resources.SharedResources.Add</button>
         <Rules rules=rule.Rules RulesChanged="WorkflowService.WorkflowUpdate" />
     </div>
 </EditForm>
@@ -135,7 +137,7 @@
             rule.LocalParams = new List<ScopedParamData>();
         }
         rule.LocalParams.Insert(0, new ScopedParamData());
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
     protected override void OnInitialized()
@@ -153,6 +155,18 @@
             rule.ExceptionMessage = "";
         }
         WorkflowService.WorkflowUpdate();
+    }
+    private string LocalizeMessage(string message)
+    {
+        if (string.IsNullOrEmpty(message)) return message;
+        if (message == "Rule was successful.") return RulesEngineEditor.Resources.SharedResources.RuleWasSuccessful;
+        if (message == "One or more adjust rules failed.") return RulesEngineEditor.Resources.SharedResources.OneOrMoreAdjustRulesFailed;
+        var m = message;
+        m = m.Replace("Validation failed:", RulesEngineEditor.Resources.SharedResources.ValidationFailed);
+        m = m.Replace("Severity: Error", RulesEngineEditor.Resources.SharedResources.SeverityError);
+        m = m.Replace("Atleast one of Rules or WorkflowsToInject must be not empty", RulesEngineEditor.Resources.SharedResources.RulesOrWorkflowsToInjectRequired);
+        m = m.Replace("Expression cannot be null or empty when RuleExpressionType is LambdaExpression", RulesEngineEditor.Resources.SharedResources.ExpressionCannotBeNullWhenLambda);
+        return m;
     }
     private Task OnValueChanged(string value)
     {

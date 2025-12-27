@@ -1,13 +1,14 @@
-﻿@*
+@*
     // Copyright (c) Alex Reich.
     // Licensed under the CC BY 4.0 License.
 *@
 @using RulesEngineEditor.Models
 @inject RulesEngineEditor.Services.WorkflowService WorkflowService
+@using RulesEngineEditor.Resources
 
 @if (rules != null)
 {
-    <button class="reeditor_button @IsPressed(sort, "button_depressed")" @onclick="(() => sort = !sort)">Arrange</button>
+    <button class="reeditor_button @IsPressed(sort, "button_depressed")" @onclick="(() => sort = !sort)">@RulesEngineEditor.Resources.SharedResources.Arrange</button>
     <span>&nbsp;</span>
     @if (sort)
     {

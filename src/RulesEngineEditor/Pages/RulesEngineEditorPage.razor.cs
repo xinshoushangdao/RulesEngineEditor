@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -138,7 +138,7 @@ namespace RulesEngineEditor.Pages
         WorkflowsChanged.InvokeAsync(Workflows);
         WorkflowDatasChanged.InvokeAsync(WorkflowService.Workflows);
         AddWorkflow();
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
     public void NewGlobalParam(WorkflowData wf)
@@ -157,7 +157,7 @@ namespace RulesEngineEditor.Pages
         workflow.Rules = new List<RuleData>();
         workflow.Seq = -1;
         WorkflowService.Workflows.Insert(0, workflow);
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
     private void SaveWorkflow()
@@ -169,7 +169,7 @@ namespace RulesEngineEditor.Pages
     private void NewInputs()
     {
         WorkflowService.Inputs = new List<InputRuleParameter>();
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
     private void AddInput()
@@ -180,7 +180,7 @@ namespace RulesEngineEditor.Pages
         parameter.Name = "param1";
         input.Parameters.Add(parameter);
         WorkflowService.Inputs.Insert(0, input);
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
     private void WorkflowUpdate()
@@ -190,7 +190,7 @@ namespace RulesEngineEditor.Pages
         DownloadInputs();
         RunRE();
         WorkflowDatasChanged.InvokeAsync(WorkflowService.Workflows);
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
     private void InputUpdate()
@@ -199,7 +199,7 @@ namespace RulesEngineEditor.Pages
         DownloadInputs();
         RunRE();
         InputJSONChanged.InvokeAsync(InputJSON);
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
     private void UpdateInputs()
@@ -227,7 +227,7 @@ namespace RulesEngineEditor.Pages
                 }
                 catch (Exception ex)
                 {
-                    inputJSONErrors += ex.Message + " ";
+                    inputJSONErrors += LocalizeError(ex.Message) + " ";
                 }
             }
             newInputs.Add(newInput);
@@ -263,7 +263,7 @@ namespace RulesEngineEditor.Pages
                 }
                 catch (Exception ex)
                 {
-                    workflowJSONErrors += ex.Message + " ";
+                    workflowJSONErrors += LocalizeError(ex.Message) + " ";
                     return;
                 }
 
@@ -277,16 +277,16 @@ namespace RulesEngineEditor.Pages
                     }
                     else
                     {
-                        rule.ExceptionMessage = "Rule was successful.";
+                        rule.ExceptionMessage = RulesEngineEditor.Resources.SharedResources.RuleWasSuccessful;
                     }
                 }
             });
         }
         catch (Exception ex)
         {
-            workflowJSONErrors += ex.Message + " ";
+            workflowJSONErrors += LocalizeError(ex.Message) + " ";
         }
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
     private async void WorkflowDragEnd(WorkflowData wf)
@@ -304,7 +304,7 @@ namespace RulesEngineEditor.Pages
         WorkflowJSONChange();
         await WorkflowsChanged.InvokeAsync(Workflows);
         await WorkflowDatasChanged.InvokeAsync(WorkflowService.Workflows);
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
     private void WorkflowJSONChange()
@@ -330,7 +330,7 @@ namespace RulesEngineEditor.Pages
         }
         catch (Exception ex)
         {
-            workflowJSONErrors = ex.Message;
+            workflowJSONErrors = LocalizeError(ex.Message);
         }
     }
 
@@ -360,7 +360,7 @@ namespace RulesEngineEditor.Pages
         }
         catch (Exception ex)
         {
-            workflowJSONErrors = ex.Message;
+            workflowJSONErrors = LocalizeError(ex.Message);
         }
     }
     private async void ImportInputs(InputFileChangeEventArgs files)
@@ -377,6 +377,12 @@ namespace RulesEngineEditor.Pages
     private void InputJSONUpdate()
     {
         inputJSONErrors = "";
+        if (string.IsNullOrWhiteSpace(InputJSON))
+        {
+            WorkflowService.Inputs = new List<InputRuleParameter>();
+            WorkflowService.RuleParameters = Array.Empty<RuleParameter>();
+            return;
+        }
         try
         {
             var inputs = JsonSerializer.Deserialize<dynamic>(InputJSON);
@@ -425,7 +431,7 @@ namespace RulesEngineEditor.Pages
         }
         catch (Exception ex)
         {
-            inputJSONErrors = ex.Message;
+            inputJSONErrors = LocalizeError(ex.Message);
         }
     }
 
@@ -434,6 +440,27 @@ namespace RulesEngineEditor.Pages
         DownloadInputAttributes = new Dictionary<string, object>();
         DownloadInputAttributes.Add("href", "data:text/plain;charset=utf-8," + JsonNormalizer.Normalize(InputJSON));
         DownloadInputAttributes.Add("download", "RulesEngineInputs.json");
+    }
+    private string LocalizeError(string message)
+    {
+        if (string.IsNullOrEmpty(message)) return message;
+        var m = message;
+        m = m.Replace("Validation failed:", RulesEngineEditor.Resources.SharedResources.ValidationFailed);
+        m = m.Replace("Severity: Error", RulesEngineEditor.Resources.SharedResources.SeverityError);
+        m = m.Replace("Workflow name can not be null or empty", RulesEngineEditor.Resources.SharedResources.WorkflowNameCannotBeEmpty);
+        m = m.Replace("Rule Name can not be null", RulesEngineEditor.Resources.SharedResources.RuleNameCannotBeNull);
+        m = m.Replace("Atleast one of Rules or WorkflowsToInject must be not empty", RulesEngineEditor.Resources.SharedResources.RulesOrWorkflowsToInjectRequired);
+        m = m.Replace("Value cannot be null.", RulesEngineEditor.Resources.SharedResources.ValueCannotBeNull);
+        m = m.Replace("(Parameter 'key')", RulesEngineEditor.Resources.SharedResources.ParameterKey);
+        m = m.Replace("(Parameter 'value')", RulesEngineEditor.Resources.SharedResources.ParameterValue);
+        m = m.Replace("Expression cannot be null or empty when RuleExpressionType is LambdaExpression", RulesEngineEditor.Resources.SharedResources.ExpressionCannotBeNullWhenLambda);
+        if (m.Contains("The input does not contain any JSON tokens"))
+            m = m.Replace("The input does not contain any JSON tokens", RulesEngineEditor.Resources.SharedResources.JsonNoTokens);
+        if (m.Contains("Expected the input to start with a valid JSON token"))
+            m = m.Replace("Expected the input to start with a valid JSON token", RulesEngineEditor.Resources.SharedResources.JsonExpectedValidToken);
+        if (m.Contains("JSON value could not be converted"))
+            m = m.Replace("JSON value could not be converted", RulesEngineEditor.Resources.SharedResources.JsonValueCouldNotBeConverted);
+        return m;
     }
 }
 }

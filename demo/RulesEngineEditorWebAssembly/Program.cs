@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 using RulesEngineEditor.Services;
 using System.Text.Json;
 using RulesEngineEditor.Shared;
+using Microsoft.JSInterop;
+using System.Globalization;
 
 namespace RulesEngineEditorWebAssembly
 {
@@ -27,13 +29,23 @@ namespace RulesEngineEditorWebAssembly
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
             builder.Services.AddRulesEngineEditor();
+            builder.Services.AddLocalization();
 
             builder.Services.AddScoped<JsonSerializerOptions>(sp =>
             {
                 return RulesEngineEditor.Shared.RulesEngineJsonSourceContext.Default.Options;
             });
 
-            await builder.Build().RunAsync();
+            var host = builder.Build();
+            var js = host.Services.GetRequiredService<IJSRuntime>();
+            var cultureName = await js.InvokeAsync<string>("blazorCulture.get");
+            if (!string.IsNullOrWhiteSpace(cultureName))
+            {
+                var culture = new CultureInfo(cultureName);
+                CultureInfo.DefaultThreadCurrentCulture = culture;
+                CultureInfo.DefaultThreadCurrentUICulture = culture;
+            }
+            await host.RunAsync();
         }
     }
 }

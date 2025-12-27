@@ -16,6 +16,8 @@ using System.Threading.Tasks;
 using RulesEngineEditor.Services;
 using RulesEngineEditor.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 
 namespace RulesEngineEditorServer
 {
@@ -34,6 +36,7 @@ namespace RulesEngineEditorServer
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
             services.AddSingleton<WeatherForecastService>();
 
             //services.AddDbContext<RulesEngineEditorDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("RulesEngineEditorDB")));
@@ -45,6 +48,14 @@ namespace RulesEngineEditorServer
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var supportedCultures = new[] { new CultureInfo("en-US"), new CultureInfo("zh-CN") };
+            var localizationOptions = new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("en-US"),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures
+            };
+            app.UseRequestLocalization(localizationOptions);
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

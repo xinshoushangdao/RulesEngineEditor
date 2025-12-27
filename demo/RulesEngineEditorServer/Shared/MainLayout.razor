@@ -1,8 +1,9 @@
-﻿@*
+@*
     // Copyright (c) Alex Reich.
     // Licensed under the CC BY 4.0 License.
 *@
 @inherits LayoutComponentBase
+@using RulesEngineEditor.Resources
 
 <div class="page">
     <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
@@ -14,11 +15,13 @@
                 <button class="navbar-toggler" hidden="@(!collapseNavMenu)" @onclick="ToggleNavMenu">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <a class="navbar-brand" href="">Rules Engine Editor</a>
+                <a class="navbar-brand" href="">@RulesEngineEditor.Resources.SharedResources.RulesEngineEditorTitle</a>
                 <div class="float-right">
-                    <a href="/demo">Demo (sample data)</a>
+                    <a href="/demo">@RulesEngineEditor.Resources.SharedResources.DemoSampleData</a>
                     &nbsp;
-                    <a href="https://github.com/alexreich/RulesEngineEditor" target="_blank">About</a>
+                    <a href="https://github.com/alexreich/RulesEngineEditor" target="_blank">@RulesEngineEditor.Resources.SharedResources.About</a>
+                    &nbsp;
+                    <RulesEngineEditor.Components.CultureSwitcher />
                 </div>
             </div>
         </div>

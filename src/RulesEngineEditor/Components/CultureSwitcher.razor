@@ -1,0 +1,18 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+@code {
+    private string selectedCulture = System.Globalization.CultureInfo.CurrentUICulture.Name;
+    private async Task OnChange(ChangeEventArgs e)
+    {
+        selectedCulture = e.Value?.ToString() ?? "en-US";
+        await JS.InvokeVoidAsync("blazorCulture.set", selectedCulture);
+        await JS.InvokeVoidAsync("setCultureCookie", selectedCulture);
+        Nav.NavigateTo(Nav.Uri, forceLoad: true);
+    }
+}
+<select class="form-select form-select-sm" value="@selectedCulture" @onchange="OnChange" style="min-width:120px">
+    <option value="en-US">English</option>
+    <option value="zh-CN">中文（简体）</option>
+    
+</select>

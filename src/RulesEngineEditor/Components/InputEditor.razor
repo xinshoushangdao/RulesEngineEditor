@@ -1,34 +1,35 @@
-﻿@*
+@*
     // Copyright (c) Alex Reich.
     // Licensed under the CC BY 4.0 License.
 *@
 @using RulesEngineEditor.Models
 @inject RulesEngineEditor.Services.WorkflowService WorkflowService
+@using RulesEngineEditor.Resources
 
 @if (Input != null)
 {
     <sp_grid_kvp>
-        <div>Input Name</div>
+        <div>@RulesEngineEditor.Resources.SharedResources.InputName</div>
     </sp_grid_kvp>
     <EditForm EditContext="@EditContext">
         <DataAnnotationsValidator />
         <ValidationSummary />
         <sp_grid_workflow>
             <div>
-                <InputText title="Name" class="form-control" @bind-Value="@Input.InputRuleName" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+                <InputText title="@RulesEngineEditor.Resources.SharedResources.InputName" class="form-control" @bind-Value="@Input.InputRuleName" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
             </div>
             <div>
-                <button title="Delete Input" @onclick="@(e => DeleteInput())" class="btn btn-secondary">
+                <button title="@RulesEngineEditor.Resources.SharedResources.Delete" @onclick="@(e => DeleteInput())" class="btn btn-secondary">
                     <span class="oi oi-trash"></span>
                 </button>
             </div>
         </sp_grid_workflow>
-        <h5>Parameters</h5>
-        <button class="reeditor_button" title="Add Input Parameter" @onclick="AddParameter">Add</button>
-        <button class="reeditor_button @IsPressed(sort, "button_depressed")" @onclick="(() => sort = !sort)">Arrange</button>
+        <h5>@RulesEngineEditor.Resources.SharedResources.Parameters</h5>
+        <button class="reeditor_button" title="@RulesEngineEditor.Resources.SharedResources.AddInputParameter" @onclick="AddParameter">@RulesEngineEditor.Resources.SharedResources.Add</button>
+        <button class="reeditor_button @IsPressed(sort, "button_depressed")" @onclick="(() => sort = !sort)">@RulesEngineEditor.Resources.SharedResources.Arrange</button>
         <sp_grid_kvp>
-            <div>Input Param Name</div>
-            <div>Value</div>
+            <div>@RulesEngineEditor.Resources.SharedResources.InputParamName</div>
+            <div>@RulesEngineEditor.Resources.SharedResources.Value</div>
         </sp_grid_kvp>
     </EditForm>
     @if (sort)
