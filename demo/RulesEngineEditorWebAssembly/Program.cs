@@ -39,12 +39,13 @@ namespace RulesEngineEditorWebAssembly
             var host = builder.Build();
             var js = host.Services.GetRequiredService<IJSRuntime>();
             var cultureName = await js.InvokeAsync<string>("blazorCulture.get");
-            if (!string.IsNullOrWhiteSpace(cultureName))
+            if (string.IsNullOrWhiteSpace(cultureName))
             {
-                var culture = new CultureInfo(cultureName);
-                CultureInfo.DefaultThreadCurrentCulture = culture;
-                CultureInfo.DefaultThreadCurrentUICulture = culture;
+                cultureName = "en-US";
             }
+            var culture = new CultureInfo(cultureName);
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
             await host.RunAsync();
         }
     }
