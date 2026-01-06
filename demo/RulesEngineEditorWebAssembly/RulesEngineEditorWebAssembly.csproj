@@ -7,6 +7,7 @@
 		<GenerateJsonSerializerAttribute>true</GenerateJsonSerializerAttribute>
 		<WasmEnableAOT>true</WasmEnableAOT>
 		<EnablePreviewFeatures>true</EnablePreviewFeatures>
+		<BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\RulesEngineEditor\RulesEngineEditor.csproj" />

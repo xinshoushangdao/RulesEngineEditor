@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Forms;
 using System.IO;
+using System.Text;
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -212,6 +213,7 @@ namespace RulesEngineEditor.Pages
         };
 
         inputJSONErrors = "";
+        StringBuilder errors = new StringBuilder();
         List<InputRuleParameterDictionary> newInputs = new List<InputRuleParameterDictionary>();
         WorkflowService.Inputs.ForEach(i => {
             InputRuleParameterDictionary newInput = new InputRuleParameterDictionary();
@@ -227,12 +229,13 @@ namespace RulesEngineEditor.Pages
                 }
                 catch (Exception ex)
                 {
-                    inputJSONErrors += LocalizeError(ex.Message) + " ";
+                    errors.Append(LocalizeError(ex.Message)).Append(" ");
                 }
             }
             newInputs.Add(newInput);
         });
 
+        inputJSONErrors = errors.ToString();
         if (inputJSONErrors == "")
         {
             InputJSON = JsonNormalizer.Normalize(JsonSerializer.Serialize(newInputs, serializationOptions));
@@ -381,6 +384,7 @@ namespace RulesEngineEditor.Pages
         {
             WorkflowService.Inputs = new List<InputRuleParameter>();
             WorkflowService.RuleParameters = Array.Empty<RuleParameter>();
+            InvokeAsync(StateHasChanged);
             return;
         }
         try
@@ -388,6 +392,7 @@ namespace RulesEngineEditor.Pages
             var inputs = JsonSerializer.Deserialize<dynamic>(InputJSON);
 
             WorkflowService.Inputs = new List<InputRuleParameter>();
+            StringBuilder errors = new StringBuilder();
 
             List<RuleParameter> ruleParameters = new List<RuleParameter>();
             foreach (var x in inputs.EnumerateArray())
@@ -404,7 +409,7 @@ namespace RulesEngineEditor.Pages
                 }
                 catch (Exception ex)
                 {
-                    inputJSONErrors += " " + ex.Message;
+                    errors.Append(" ").Append(ex.Message);
                 }
 
                 InputRuleParameter input = new InputRuleParameter();
@@ -428,6 +433,7 @@ namespace RulesEngineEditor.Pages
                 ruleParameters.Add(new RuleParameter(key, values));
             }
             WorkflowService.RuleParameters = ruleParameters.ToArray();
+            inputJSONErrors = errors.ToString();
         }
         catch (Exception ex)
         {
